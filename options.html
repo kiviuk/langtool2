@@ -10,17 +10,9 @@
 </head>
 <body>
     <h1>AI Model Configuration</h1>
-    <label for="model-select">Choose your default model:</label>
-    <br><br>
-    
-    <select id="model-select">
-        <option value="">-- Select a Model --</option>
-    </select>
-
+    <select id="model-select"></select>
     <div id="status" class="status"></div>
 
-    <!-- Order matters: Load data first, then the logic -->
-    <script src="models.js"></script>
-    <script src="options.js"></script>
+    <script type="module" src="options.js"></script>
 </body>
 </html>

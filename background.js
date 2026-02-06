@@ -1,20 +1,14 @@
+import { AI, UI, ACTIONS } from './constants.js';
+
 console.log("Background script loaded.");
 
-browser.runtime.onMessage.addListener((message, sender) => {
-    if (message.status === "typing") {
-        console.log("The background script knows the user is in a text field on tab: " + sender.tab.id);
-        
-        // Example: Change the extension icon color to show it's active
-        browser.browserAction.setBadgeText({text: "!", tabId: sender.tab.id});
-    } else {
-        browser.browserAction.setBadgeText({text: "", tabId: sender.tab.id});
-    }
-});
+let activeModelId = AI.DEFAULT_MODEL;
 
-let activeModelId = "google/gemini-2.0-flash-001";
-
+// On startup, check storage. If empty, write the default to storage.
 browser.storage.local.get('selectedModel').then(res => {
-    if (res.selectedModel) activeModelId = res.selectedModel;
+    const val = res.selectedModel || AI.DEFAULT_MODEL;
+    activeModelId = val;
+    browser.storage.local.set({ selectedModel: val });
 });
 
 browser.storage.onChanged.addListener((changes) => {
@@ -22,12 +16,18 @@ browser.storage.onChanged.addListener((changes) => {
 });
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "TEXT_FIELD_FOCUSED") {
-        browser.browserAction.setBadgeText({text: "AI", tabId: sender.tab.id});
-        browser.browserAction.setBadgeBackgroundColor({color: "#4CAF50"});
+    if (message.action === ACTIONS.FOCUS) {
+        console.log("Observer detected text field on tab: " + sender.tab.id);
+        
+        // Set the Badge
+        browser.browserAction.setBadgeText({ text: UI.BADGE_TEXT, tabId: sender.tab.id });
+        browser.browserAction.setBadgeBackgroundColor({ color: UI.BADGE_COLOR });
+        
+        // Send State back to Observer
         sendResponse({ activeModel: activeModelId });
     } 
-    else if (message.action === "TEXT_FIELD_BLURRED") {
-        browser.browserAction.setBadgeText({text: "", tabId: sender.tab.id});
+    else if (message.action === ACTIONS.BLUR) {
+        browser.browserAction.setBadgeText({ text: "", tabId: sender.tab.id });
     }
+    return true; // Keeps the messaging channel open for async response
 });

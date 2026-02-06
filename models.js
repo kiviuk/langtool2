@@ -1,4 +1,4 @@
-const AI_MODELS = [
+export const AI_MODELS = [
   {
     group: "⚖️ Balanced (Quality + Speed)",
     models: [

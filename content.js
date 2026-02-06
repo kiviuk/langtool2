@@ -1,4 +1,5 @@
-// 
+import { ACTIONS } from './constants.js';
+
 // Function to check if an element is a text input
 function isTextField(el) {
     if (!el) return false;
@@ -16,7 +17,6 @@ function isTextField(el) {
     // Check for modern "rich text" editors (like Gmail, Notion, Discord)
     const isEditable = el.contentEditable === 'true' || el.getAttribute('contenteditable') === 'true';
 
- QS
     return isInput || isTextArea || isEditable;
 }
 
@@ -30,11 +30,10 @@ document.addEventListener('focusin', () => {
         
         // Notify the State Machine
         browser.runtime.sendMessage({ 
-            action: "TEXT_FIELD_FOCUSED" 
+            action: ACTIONS.FOCUS
         }).then(response => {
-            // The Brain replies with the current state (selected AI model)
             if (response && response.activeModel) {
-                console.log("Current State: Using AI Model ->", response.activeModel);
+                console.log("Current AI Model:", response.activeModel);
             }
         }).catch(err => console.warn("Background script not ready yet."));
     }
@@ -44,6 +43,6 @@ document.addEventListener('focusin', () => {
 // Event: User clicks away or leaves the field
 document.addEventListener('focusout', () => {
     browser.runtime.sendMessage({ 
-        action: "TEXT_FIELD_BLURRED" 
+        action: ACTIONS.BLUR
     }).catch(() => {/* Ignore errors if background is sleeping */});
 });
