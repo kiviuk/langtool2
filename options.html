@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extension Preferences</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        select { padding: 8px; width: 100%; max-width: 400px; border-radius: 4px; }
+        .status { color: green; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>AI Model Configuration</h1>
+    <label for="model-select">Choose your default model:</label>
+    <br><br>
+    
+    <select id="model-select">
+        <option value="">-- Select a Model --</option>
+    </select>
+
+    <div id="status" class="status"></div>
+
+    <!-- Order matters: Load data first, then the logic -->
+    <script src="models.js"></script>
+    <script src="options.js"></script>
+</body>
+</html>
