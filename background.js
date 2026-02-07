@@ -2,17 +2,33 @@ import { AI, UI, ACTIONS } from './constants.js';
 
 console.log("Background script loaded.");
 
+// 1. Initialize with defaults immediately
 let activeModelId = AI.DEFAULT_MODEL;
+let openRouterKey = ""; // Local cache for the key
 
-// On startup, check storage. If empty, write the default to storage.
-browser.storage.local.get('selectedModel').then(res => {
-    const val = res.selectedModel || AI.DEFAULT_MODEL;
-    activeModelId = val;
-    browser.storage.local.set({ selectedModel: val });
+// 2. Set defaults in storage ONLY ONCE (for the Options UI)
+browser.runtime.onInstalled.addListener(() => {
+    browser.storage.local.get(['selectedModel', 'darkMode']).then(res => {
+        const defaults = {};
+        if (res.selectedModel === undefined) defaults.selectedModel = AI.DEFAULT_MODEL;
+        if (res.darkMode === undefined)      defaults.darkMode = true;
+        
+        if (Object.keys(defaults).length > 0) {
+            browser.storage.local.set(defaults);
+        }
+    });
 });
 
+// 3. Load user preferences
+browser.storage.local.get(['selectedModel', 'openRouterKey']).then(res => {
+    if (res.selectedModel) activeModelId = res.selectedModel;
+    if (res.openRouterKey) openRouterKey = res.openRouterKey;
+});
+
+// 4. Watch for future changes
 browser.storage.onChanged.addListener((changes) => {
     if (changes.selectedModel) activeModelId = changes.selectedModel.newValue;
+    if (changes.openRouterKey) openRouterKey = changes.openRouterKey.newValue;
 });
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
